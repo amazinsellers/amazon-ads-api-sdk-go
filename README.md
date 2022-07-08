@@ -9,7 +9,7 @@ Follow requirements [here](https://advertising.amazon.com/API/docs/en-us/onboard
 
 ### Step-2: Create authentication grant
 If intending to interact with the Ads API for just one Seller/Vendor account, follow the instructions [here](https://advertising.amazon.com/API/docs/en-us/getting-started/create-authorization-grant#to-grant-access-to-your-own-amazon-ads-data).
-This library cannot help with this step, as it is driven by a browser session.
+This library cannot help with creating the authentication grant, as it is driven by a browser session.
 
 ### Step-3: Generate access and refresh tokens
 #### Get config from environment variables
