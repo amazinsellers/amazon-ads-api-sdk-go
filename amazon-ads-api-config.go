@@ -6,12 +6,15 @@ import (
 )
 
 type AmazonAdsApiConfig struct {
-	ClientId     string
-	ClientSecret string
-	RedirectUri  string
+	IsDebugEnabled bool
+	ClientId       string
+	ClientSecret   string
+	RedirectUri    string
 }
 
 func NewAmazonAdsApiConfig() (*AmazonAdsApiConfig, error) {
+	debug := os.Getenv("DEBUG")
+
 	clientId := os.Getenv("AMAZON_ADS_API_CLIENTID")
 
 	if clientId == "" {
@@ -26,14 +29,15 @@ func NewAmazonAdsApiConfig() (*AmazonAdsApiConfig, error) {
 
 	redirectUri := os.Getenv("AMAZON_ADS_API_REDIRECTURI")
 
-	if clientId == "" {
+	if redirectUri == "" {
 		return nil, errors.New("required env var not present: AMAZON_ADS_API_REDIRECTURI")
 	}
 
 	return &AmazonAdsApiConfig{
-		ClientId:     clientId,
-		ClientSecret: clientSecret,
-		RedirectUri:  redirectUri,
+		IsDebugEnabled: debug == "1",
+		ClientId:       clientId,
+		ClientSecret:   clientSecret,
+		RedirectUri:    redirectUri,
 	}, nil
 
 }

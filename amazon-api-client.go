@@ -22,15 +22,18 @@ type AmazonApiClient struct {
 	ClientId     string
 	ClientSecret string
 	RedirectUri  string
+
+	IsDebugEnabled bool
 }
 
 func NewAmazonApiClient(regionCode string, config *AmazonAdsApiConfig) *AmazonApiClient {
 	if regionUrl, isPresent := amazonApiRegionToURLMap[regionCode]; isPresent {
 		return &AmazonApiClient{
-			URL:          regionUrl,
-			ClientId:     config.ClientId,
-			ClientSecret: config.ClientSecret,
-			RedirectUri:  config.RedirectUri,
+			URL:            regionUrl,
+			ClientId:       config.ClientId,
+			ClientSecret:   config.ClientSecret,
+			RedirectUri:    config.RedirectUri,
+			IsDebugEnabled: config.IsDebugEnabled,
 		}
 	}
 
@@ -89,6 +92,10 @@ func (o *AmazonApiClient) CallAPI(path string, values url.Values) (string, error
 
 	if len(values) != 0 {
 		URL = fmt.Sprintf("%s?%s", URL, qs.ConstructEncodedQueryString(values))
+	}
+
+	if o.IsDebugEnabled {
+		fmt.Println("(AmazonApiClient) calling uri: " + URL)
 	}
 
 	response, err := http.Get(URL)
