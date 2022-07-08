@@ -1,0 +1,22 @@
+package amazon_ads_api
+
+import (
+	"net/http"
+	"strings"
+)
+
+func main() {
+	adsApiConfig, _ := NewAmazonAdsApiConfig()
+	amazonApiClient := NewAmazonApiClient(AmazonRegions.Europe, adsApiConfig)
+	token, _ := amazonApiClient.GetRefreshToken("<THE_CODE_FROM_BROWSER_SESSION>")
+
+	client := NewAmazonAdsClient(amazonApiClient)
+	client.SetToken(token)
+
+	client.GetProfiles()
+
+	profileId := ""
+
+	body := strings.NewReader("{\"stateFilter\": \"enabled\",\"reportDate\": \"20220706\",\"metrics\": \"adGroupId,adGroupName,attributedConversions14d,attributedConversions14dSameSKU\"}")
+	respBytes, err := client.CallAPI(http.MethodPost, "v2/sp/keywords/report", body, profileId)
+}
