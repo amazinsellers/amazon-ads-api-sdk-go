@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/amazinsellers/amazon-ads-api-sdk-go/qs"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -65,7 +66,7 @@ func (o *AmazonApiClient) RefreshToken(refreshToken string) (*AmazonApiTokenResp
 
 func (o *AmazonApiClient) getToken(values url.Values) (*AmazonApiTokenResponse, error) {
 	path := "auth/o2/token"
-	respStr, err := o.CallAPI(path, values)
+	respStr, err := o.CallAPI(path, values, http.MethodPost, nil)
 
 	if err != nil {
 		return nil, err
@@ -84,7 +85,7 @@ func (o *AmazonApiClient) getToken(values url.Values) (*AmazonApiTokenResponse, 
 	return tokenResponse, nil
 }
 
-func (o *AmazonApiClient) CallAPI(path string, values url.Values) (string, error) {
+func (o *AmazonApiClient) CallAPI(path string, values url.Values, method string, body io.Reader) (string, error) {
 	errStr := "call to amazon-api failed(%d): %s"
 
 	URL := fmt.Sprintf("%s/%s",
@@ -98,10 +99,18 @@ func (o *AmazonApiClient) CallAPI(path string, values url.Values) (string, error
 		fmt.Println("(AmazonApiClient) calling uri: " + URL)
 	}
 
-	response, err := http.Get(URL)
-
+	req, err := o.GetHttpRequest(method, URL, body)
 	if err != nil {
 		err = fmt.Errorf(errStr, 1, err.Error())
+		log.Println(err.Error())
+		return "", err
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(req)
+
+	if err != nil {
+		err = fmt.Errorf(errStr, 2, err.Error())
 		log.Println(err.Error())
 		return "", err
 	}
@@ -117,10 +126,21 @@ func (o *AmazonApiClient) CallAPI(path string, values url.Values) (string, error
 	respBytes, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		err = fmt.Errorf(errStr, 2, err.Error())
+		err = fmt.Errorf(errStr, 3, err.Error())
 		log.Println(err.Error())
 		return "", err
 	}
 
 	return string(respBytes), nil
+}
+
+func (o *AmazonApiClient) GetHttpRequest(method string, URL string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, URL, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+
+	return req, nil
 }
