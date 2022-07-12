@@ -10,7 +10,7 @@ func main() {
 	amazonApiClient := NewAmazonApiClient(AmazonRegions.Europe, adsApiConfig)
 	token, _ := amazonApiClient.GetRefreshToken("<THE_CODE_FROM_BROWSER_SESSION>")
 
-	client := NewAmazonAdsClient(amazonApiClient)
+	client := NewAmazonAdsClient(AmazonRegions.Europe, amazonApiClient)
 	client.SetToken(token)
 
 	client.GetProfiles()

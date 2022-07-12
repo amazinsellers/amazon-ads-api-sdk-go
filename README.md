@@ -38,7 +38,7 @@ The access token expires in 1 hour. The refreshing of the tokens are handled inh
 For further calls to APIs, a profile ID is needed. A profile is related to one country ad account for the authorised user.
 
 ```go
-client := NewAmazonAdsClient(amazonApiClient)
+client := NewAmazonAdsClient(AmazonRegions.Europe, amazonApiClient)
 client.SetToken(token)
 ```
 

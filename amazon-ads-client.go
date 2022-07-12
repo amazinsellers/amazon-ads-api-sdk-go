@@ -19,10 +19,15 @@ type AmazonAdsClient struct {
 	AmazonApiClient *AmazonApiClient
 }
 
-func NewAmazonAdsClient(amazonApiClient *AmazonApiClient) *AmazonAdsClient {
-	return &AmazonAdsClient{
-		AmazonApiClient: amazonApiClient,
+func NewAmazonAdsClient(regionCode string, amazonApiClient *AmazonApiClient) *AmazonAdsClient {
+	if regionUrl, isPresent := amazonAdsApiRegionToURLMap[regionCode]; isPresent {
+		return &AmazonAdsClient{
+			URL:             regionUrl,
+			AmazonApiClient: amazonApiClient,
+		}
 	}
+
+	return nil
 }
 
 func (o *AmazonAdsClient) HasTokenExpired() bool {
