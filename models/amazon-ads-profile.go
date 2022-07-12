@@ -1,10 +1,10 @@
 package amazon_ads_api_models
 
 type Profile struct {
-	ProfileId   string `json:"profileId"`
-	CountryCode string `json:"countryCode"`
-	DailyBudget string `json:"dailyBudget"`
-	TimeZone    string `json:"timezone"`
+	ProfileId   int64   `json:"profileId"`
+	CountryCode string  `json:"countryCode"`
+	DailyBudget float64 `json:"dailyBudget"`
+	TimeZone    string  `json:"timezone"`
 
 	AccountInfo ProfileAccountInfo `json:"accountInfo"`
 }
@@ -14,5 +14,5 @@ type ProfileAccountInfo struct {
 	Id                  string `json:"id"`
 	Type                string `json:"type"`
 	Name                string `json:"name"`
-	ValidPaymentMethod  string `json:"validPaymentMethod"`
+	ValidPaymentMethod  bool   `json:"validPaymentMethod"`
 }
