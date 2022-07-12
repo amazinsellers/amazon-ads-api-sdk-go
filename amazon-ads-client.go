@@ -1,8 +1,10 @@
 package amazon_ads_api
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	amazon_ads_api_models "github.com/amazinsellers/amazon-ads-api-sdk-go/models"
 	"io"
 	"io/ioutil"
 	"log"
@@ -69,15 +71,22 @@ func (o *AmazonAdsClient) SetToken(token *AmazonApiTokenResponse) {
 	o.TokenExpiry = time.Now().UTC().Add(time.Duration(token.ExpiresIn) * time.Second)
 }
 
-func (o *AmazonAdsClient) GetProfiles() (string, error) {
+func (o *AmazonAdsClient) GetProfiles() (*[]amazon_ads_api_models.Profile, error) {
 	path := "v2/profiles"
 	resp, err := o.CallAPI(http.MethodGet, path, nil, "")
 
-	if resp != nil {
-		return string(resp), err
+	if resp == nil {
+		return nil, err
 	}
 
-	return "", err
+	profiles := make([]amazon_ads_api_models.Profile, 0)
+	err = json.Unmarshal(resp, &profiles)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot unmarshal profiles. response: %s. error: %s", string(resp), err.Error())
+	}
+
+	return &profiles, nil
 }
 
 func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, profileId string) ([]byte, error) {
