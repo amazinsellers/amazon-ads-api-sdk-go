@@ -5,6 +5,8 @@ type Profile struct {
 	CountryCode string `json:"countryCode"`
 	DailyBudget string `json:"dailyBudget"`
 	TimeZone    string `json:"timezone"`
+
+	AccountInfo ProfileAccountInfo `json:"accountInfo"`
 }
 
 type ProfileAccountInfo struct {
