@@ -73,9 +73,13 @@ func (o *AmazonAdsClient) SetToken(token *AmazonApiTokenResponse) {
 
 func (o *AmazonAdsClient) GetProfiles() (*[]amazon_ads_api_models.Profile, error) {
 	path := "v2/profiles"
-	resp, err := o.CallAPI(http.MethodGet, path, nil, "")
+	resp, _, err := o.CallAPI(http.MethodGet, path, nil, "")
 
 	if resp == nil {
+		return nil, err
+	}
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -89,14 +93,14 @@ func (o *AmazonAdsClient) GetProfiles() (*[]amazon_ads_api_models.Profile, error
 	return &profiles, nil
 }
 
-func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, profileId string) ([]byte, error) {
+func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, profileId string) ([]byte, int, error) {
 	errStrBase := "call to amazon-ads-api " + path + " failed"
 	errStr := errStrBase + "(%d): %s"
 
 	err := o.SetAccessToken()
 
 	if err != nil {
-		return nil, fmt.Errorf(errStr, 1, err.Error())
+		return nil, http.StatusInternalServerError, fmt.Errorf(errStr, 1, err.Error())
 	}
 
 	URL := fmt.Sprintf("%s/%s",
@@ -104,7 +108,7 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 
 	req, err := o.GetHttpRequest(method, URL, body, profileId)
 	if err != nil {
-		return nil, fmt.Errorf(errStr, 2, err.Error())
+		return nil, http.StatusInternalServerError, fmt.Errorf(errStr, 2, err.Error())
 	}
 
 	client := &http.Client{}
@@ -113,7 +117,7 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 	if err != nil {
 		err = fmt.Errorf(errStr, 3, err.Error())
 		log.Println(err.Error())
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
 	if response.StatusCode/100 != 2 {
@@ -121,7 +125,7 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 		err = fmt.Errorf(errStrBase+" with response: %s", string(respBytes))
 		log.Println(err.Error())
 
-		return nil, err
+		return respBytes, response.StatusCode, err
 	}
 
 	respBytes, err := ioutil.ReadAll(response.Body)
@@ -129,10 +133,10 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 	if err != nil {
 		err = fmt.Errorf(errStr, 4, err.Error())
 		log.Println(err.Error())
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return respBytes, nil
+	return respBytes, response.StatusCode, nil
 }
 
 func (o *AmazonAdsClient) GetHttpRequest(method string, URL string, body io.Reader, profileId string) (*http.Request, error) {
