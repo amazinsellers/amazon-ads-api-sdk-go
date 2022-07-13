@@ -10,7 +10,7 @@ func main() {
 	amazonApiClient := NewAmazonApiClient(AmazonRegions.Europe, adsApiConfig)
 	token, _ := amazonApiClient.GetRefreshToken("<THE_CODE_FROM_BROWSER_SESSION>")
 
-	client := NewAmazonAdsClient(AmazonRegions.Europe, amazonApiClient)
+	client := NewAmazonAdsClient(AmazonRegions.Europe, amazonApiClient, adsApiConfig)
 	client.SetToken(token)
 
 	client.GetProfiles()
@@ -18,5 +18,5 @@ func main() {
 	profileId := ""
 
 	body := strings.NewReader("{\"stateFilter\": \"enabled\",\"reportDate\": \"20220706\",\"metrics\": \"adGroupId,adGroupName,attributedConversions14d,attributedConversions14dSameSKU\"}")
-	respBytes, err := client.CallAPI(http.MethodPost, "v2/sp/keywords/report", body, profileId)
+	respBytes, statusCode, err := client.CallAPI(http.MethodPost, "v2/sp/keywords/report", body, profileId)
 }

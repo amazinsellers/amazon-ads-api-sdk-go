@@ -38,7 +38,7 @@ The access token expires in 1 hour. The refreshing of the tokens are handled inh
 For further calls to APIs, a profile ID is needed. A profile is related to one country ad account for the authorised user.
 
 ```go
-client := NewAmazonAdsClient(AmazonRegions.Europe, amazonApiClient)
+client := NewAmazonAdsClient(AmazonRegions.Europe, amazonApiClient, adsApiConfig)
 client.SetToken(token)
 ```
 
@@ -58,9 +58,10 @@ Parse the json string, get the profile ID, and pass it in the further calls to o
 ### Step-6: Call desired endpoint
 ```go
 body := strings.NewReader("{\"stateFilter\": \"enabled\",\"reportDate\": \"20220706\",\"metrics\": \"adGroupId,adGroupName,attributedConversions14d,attributedConversions14dSameSKU\"}")
-respBytes, err := client.CallAPI(http.MethodPost, "v2/sp/keywords/report", body, profileId)
+respBytes, statusCode, err := client.CallAPI(http.MethodPost, "v2/sp/keywords/report", body, profileId)
 ```
 
 The method `CallAPI`:
 * refreshes the access token if it has expired. If `client.RefreshToken` is not set, this will result in an error.
 * returns response as `[]byte`
+* forwards `statusCode` from the call made to Amazon Ads API

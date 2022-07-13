@@ -13,19 +13,21 @@ import (
 )
 
 type AmazonAdsClient struct {
-	RefreshToken string
-	AccessToken  string
-	TokenExpiry  time.Time
-	URL          string
+	RefreshToken   string
+	AccessToken    string
+	TokenExpiry    time.Time
+	URL            string
+	IsDebugEnabled bool
 
 	AmazonApiClient *AmazonApiClient
 }
 
-func NewAmazonAdsClient(regionCode string, amazonApiClient *AmazonApiClient) *AmazonAdsClient {
+func NewAmazonAdsClient(regionCode string, amazonApiClient *AmazonApiClient, config *AmazonAdsApiConfig) *AmazonAdsClient {
 	if regionUrl, isPresent := amazonAdsApiRegionToURLMap[regionCode]; isPresent {
 		return &AmazonAdsClient{
 			URL:             regionUrl,
 			AmazonApiClient: amazonApiClient,
+			IsDebugEnabled:  config.IsDebugEnabled,
 		}
 	}
 
@@ -109,6 +111,10 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 	req, err := o.GetHttpRequest(method, URL, body, profileId)
 	if err != nil {
 		return nil, http.StatusInternalServerError, fmt.Errorf(errStr, 2, err.Error())
+	}
+
+	if o.IsDebugEnabled {
+		fmt.Println("(AmazonApiClient) calling uri: " + URL)
 	}
 
 	client := &http.Client{}
