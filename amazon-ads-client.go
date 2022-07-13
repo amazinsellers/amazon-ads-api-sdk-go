@@ -146,6 +146,7 @@ func (o *AmazonAdsClient) GetHttpRequest(method string, URL string, body io.Read
 	}
 
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Amazon-Advertising-API-ClientId", o.AmazonApiClient.ClientId)
 	req.Header.Set("Authorization", "Bearer "+o.AccessToken)
 
