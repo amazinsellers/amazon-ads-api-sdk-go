@@ -41,11 +41,15 @@ func NewAmazonApiClient(regionCode string, config *AmazonAdsApiConfig) *AmazonAp
 	return nil
 }
 
-func (o *AmazonApiClient) GetRefreshToken(code string) (*AmazonApiTokenResponse, error) {
+func (o *AmazonApiClient) GetRefreshToken(code string, redirectUri string) (*AmazonApiTokenResponse, error) {
+	if redirectUri == "" {
+		redirectUri = o.RedirectUri
+	}
+
 	values := url.Values{
 		"grant_type":    {"authorization_code"},
 		"code":          {code},
-		"redirect_uri":  {o.RedirectUri},
+		"redirect_uri":  {redirectUri},
 		"client_id":     {o.ClientId},
 		"client_secret": {o.ClientSecret},
 	}
