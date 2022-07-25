@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"time"
 )
 
@@ -114,7 +115,12 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 	}
 
 	if o.IsDebugEnabled {
-		fmt.Println("(AmazonApiClient) calling uri: " + URL)
+		requestDump, err := httputil.DumpRequest(req, true)
+		if err == nil {
+			fmt.Println("==========================================")
+			fmt.Print("request dump:\n\n")
+			fmt.Println(string(requestDump))
+		}
 	}
 
 	client := &http.Client{}
@@ -124,6 +130,15 @@ func (o *AmazonAdsClient) CallAPI(method string, path string, body io.Reader, pr
 		err = fmt.Errorf(errStr, 3, err.Error())
 		log.Println(err.Error())
 		return nil, http.StatusInternalServerError, err
+	}
+
+	if o.IsDebugEnabled {
+		dumpResponse, err := httputil.DumpResponse(response, true)
+		if err == nil {
+			fmt.Println("==========================================")
+			fmt.Print("response dump:\n\n")
+			fmt.Println(string(dumpResponse))
+		}
 	}
 
 	if response.StatusCode/100 != 2 {
